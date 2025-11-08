@@ -14,15 +14,63 @@ enum Role {
   USER
 }
 
-
-
 model User {
+  id           String    @id @default(uuid())
+  name         String
+  email        String    @unique
+  password     String
+  phone        String?
+  role         Role      @default(USER)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  resetToken   String? 
+  resetExpires DateTime?
+
+  teams        Team[]    @relation("TeamUsers")
+  leads        Lead[]    @relation("LeadOwner")
+  activities   Activity[]
+}
+
+
+model Team {
   id        String   @id @default(uuid())
   name      String
-  email     String   @unique
-  password  String   // for bcrypt hashed password
-  phone     String?
-  role      Role     @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Relations
+  users User[] @relation("TeamUsers")
+  leads Lead[]
+}
+
+model Lead {
+  id          String     @id @default(uuid())
+  name        String
+  email       String?
+  phone       String?
+  company     String?
+  status      String     @default("NEW") // e.g., NEW, CONTACTED, QUALIFIED, WON, LOST
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  ownerId String?
+  owner   User?       @relation("LeadOwner", fields: [ownerId], references: [id])
+  teamId  String?
+  team    Team?       @relation(fields: [teamId], references: [id])
+  activities Activity[]
+}
+
+model Activity {
+  id        String   @id @default(uuid())
+  type      String   // note | call | meeting | status_change etc.
+  content   String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  leadId String
+  lead   Lead   @relation(fields: [leadId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 }

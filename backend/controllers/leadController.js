@@ -1,37 +1,55 @@
-const { prisma } = require("../config/db");
+const prisma = require('../config/db');
 
-exports.createLead = async (req, res) => {
-  try {
-    const { name, email, phone, status } = req.body;
-
-    if (!name || !email) {
-      return res.status(400).json({ error: "Name and Email are required" });
-    }
-
-    const lead = await prisma.lead.create({
-      data: { name, email, phone, status },
-    });
-
-    res.status(201).json(lead);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+const createLead = async (req, res) => {
+  const { name, email, phone, company, ownerId, teamId } = req.body;
+  const lead = await prisma.lead.create({
+    data: { name, email, phone, company, ownerId, teamId }
+  });
+  res.status(201).json(lead);
 };
 
-exports.getLeads = async (req, res) => {
-  const leads = await prisma.lead.findMany();
+const listLeads = async (req, res) => {
+  const { status, ownerId, teamId } = req.query;
+  const where = {};
+  if (status) where.status = status;
+  if (ownerId) where.ownerId = ownerId;
+  if (teamId) where.teamId = teamId;
+  const leads = await prisma.lead.findMany({ where, include: { owner: true, team: true } });
   res.json(leads);
 };
 
-exports.updateLead = async (req, res) => {
-  const lead = await prisma.lead.update({
-    where: { id: req.params.id },
-    data: req.body,
+const getLead = async (req, res) => {
+  const { id } = req.params;
+  const lead = await prisma.lead.findUnique({
+    where: { id },
+    include: { owner: true, team: true, activities: true, histories: true }
   });
+  if (!lead) return res.status(404).json({ message: 'Not found' });
   res.json(lead);
 };
 
-exports.deleteLead = async (req, res) => {
-  await prisma.lead.delete({ where: { id: req.params.id } });
-  res.json({ message: "Lead Deleted" });
+const updateLead = async (req, res) => {
+  const { id } = req.params;
+  const data = req.body;
+  const prev = await prisma.lead.findUnique({ where: { id } });
+  const updated = await prisma.lead.update({ where: { id }, data });
+  if (data.status && prev && prev.status !== data.status) {
+    await prisma.leadHistory.create({
+      data: {
+        leadId: id,
+        changedBy: req.user.id,
+        changeType: 'STATUS_CHANGE',
+        changeData: { from: prev.status, to: data.status }
+      }
+    });
+  }
+  res.json(updated);
 };
+
+const deleteLead = async (req, res) => {
+  const { id } = req.params;
+  await prisma.lead.delete({ where: { id } });
+  res.status(204).send();
+};
+
+module.exports = { createLead, listLeads, getLead, updateLead, deleteLead };
