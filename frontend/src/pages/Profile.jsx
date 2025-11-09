@@ -3,6 +3,7 @@ import { Container, Card } from "../components/styles";
 import axios from "axios";
 import Loader from "../components/Loader";
 import styled from "styled-components";
+import { api } from "../utils/api";
 
 // Neumorphic input
 const Input = styled.input`
@@ -56,7 +57,7 @@ export default function Profile() {
   const token = localStorage.getItem("token");
 
   const axiosInstance = axios.create({
-    baseURL: "http://localhost:5000/api/v1",
+    baseURL: `${api}`,
     headers: { Authorization: `Bearer ${token}` },
   });
 

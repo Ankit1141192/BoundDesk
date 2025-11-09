@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { Container, Card } from "../components/styles";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { api } from "../utils/api";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -30,7 +31,7 @@ export default function ForgotPassword() {
     try {
       setLoading(true);
       const res = await axios.post(
-        "http://localhost:5000/api/v1/auth/forgot-password",
+        `${api}/auth/forgot-password`,
         { email }
       );
       setMsg(res.data.msg);

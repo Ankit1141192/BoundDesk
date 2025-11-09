@@ -6,6 +6,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell
 } from "recharts";
+import { api } from "../utils/api";
 
 const Container = styled.div`
   padding: 2rem;
@@ -84,7 +85,7 @@ export default function Dashboard() {
 
   const token = localStorage.getItem("token");
   const axiosInstance = axios.create({
-    baseURL: "http://localhost:5000/api/v1",
+    baseURL: `${api}`,
     headers: { Authorization: `Bearer ${token}` },
   });
 

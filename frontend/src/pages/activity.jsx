@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import axios from "axios";
 import Loader from "../components/Loader";
+import { api } from "../utils/api";
 
 const GlobalStyle = createGlobalStyle`
   body.modal-open {
@@ -130,7 +131,7 @@ export default function Activities({ leadId }) {
   const token = localStorage.getItem("token");
 
   const axiosInstance = axios.create({
-    baseURL: "http://localhost:5000/api/v1",
+    baseURL: `${api}`,
     headers: { Authorization: `Bearer ${token}` },
   });
 

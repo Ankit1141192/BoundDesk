@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Container, Card } from "../components/styles";
 import { Link, useNavigate } from "react-router-dom";
+import { api } from "../utils/api";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ export default function Signup() {
         role: form.role, // Send role as-is, don't uppercase
       };
 
-      const res = await fetch("http://localhost:5000/api/v1/auth/signup", {
+      const res = await fetch(`${api}/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
