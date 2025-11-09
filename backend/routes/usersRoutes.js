@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const { me, listUsers, updateUser } = require('../controllers/userController');
-const auth = require('../middlewares/authMiddleware');
-const role = require('../middlewares/roleMiddleware');
+const { authMiddleware, authorizeRoles } = require('../middlewares/auth'); // fixed import
 
-router.get('/me', auth, me);
-router.get('/', auth, role(['ADMIN']), listUsers);
-router.patch('/:id', auth, updateUser);
+// Routes
+router.get('/me', authMiddleware, me); // any logged-in user
+router.get('/', authMiddleware, authorizeRoles(['ADMIN']), listUsers); // only admin
+router.patch('/:id', authMiddleware, updateUser); // admin or self
 
 module.exports = router;

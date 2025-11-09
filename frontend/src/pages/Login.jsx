@@ -2,6 +2,8 @@ import { useState, useRef } from "react";
 import { Container, Card } from "../components/styles";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "../redux/authSlice";
 import Loader from "../components/Loader";
 
 export default function Login() {
@@ -12,6 +14,8 @@ export default function Login() {
   const [showSuccess, setShowSuccess] = useState(false);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const emailError = useRef(null);
   const passwordError = useRef(null);
   const loginForm = useRef(null);
@@ -54,15 +58,16 @@ export default function Login() {
         email,
         password,
       });
-
+      
       localStorage.setItem("token", res.data.token);
+      dispatch(loginSuccess(res.data.user));
 
       setLoading(false);
       setShowSuccess(true);
       loginForm.current.style.display = "none";
 
+      // Redirect to dashboard after short delay
       setTimeout(() => navigate("/dashboard"), 1200);
-
     } catch (err) {
       setLoading(false);
       if (err.response?.data?.msg) {
@@ -147,6 +152,7 @@ export default function Login() {
 
               {/* SUBMIT */}
               <button
+                type="submit"
                 className={`cursor-pointer w-full py-4 rounded-xl bg-[#e0e5ec] text-[#3d4468] font-semibold shadow-[8px_8px_20px_#bec3cf,-8px_-8px_20px_#ffffff] disabled:opacity-60 disabled:cursor-not-allowed ${
                   loading && "opacity-60 pointer-events-none"
                 }`}
@@ -158,7 +164,6 @@ export default function Login() {
             <div className="mt-6 flex justify-between">
               <Link to="/forgot" className="text-[#6F73FF] text-sm underline">Forgot Password?</Link>
               <Link to="/signup" className="text-[#6F73FF] text-sm underline">Create Account</Link>
-
             </div>
           </>
         )}
@@ -166,7 +171,7 @@ export default function Login() {
         {showSuccess && (
           <div className="text-center py-6">
             <h3 className="text-[#3d4468] text-lg font-semibold">Login Successful</h3>
-            <Loader/>
+            <Loader />
           </div>
         )}
 

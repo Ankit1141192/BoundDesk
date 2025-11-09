@@ -29,8 +29,8 @@ model User {
   teams        Team[]    @relation("TeamUsers")
   leads        Lead[]    @relation("LeadOwner")
   activities   Activity[]
+  histories    LeadHistory[] @relation("UserLeadHistory")
 }
-
 
 model Team {
   id        String   @id @default(uuid())
@@ -38,7 +38,6 @@ model Team {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relations
   users User[] @relation("TeamUsers")
   leads Lead[]
 }
@@ -49,28 +48,39 @@ model Lead {
   email       String?
   phone       String?
   company     String?
-  status      String     @default("NEW") // e.g., NEW, CONTACTED, QUALIFIED, WON, LOST
+  status      String     @default("NEW")
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
-  // Relations
-  ownerId String?
-  owner   User?       @relation("LeadOwner", fields: [ownerId], references: [id])
+  ownerId String
+  owner   User       @relation("LeadOwner", fields: [ownerId], references: [id])
   teamId  String?
-  team    Team?       @relation(fields: [teamId], references: [id])
+  team    Team?      @relation(fields: [teamId], references: [id])
   activities Activity[]
+  histories  LeadHistory[]
 }
 
 model Activity {
   id        String   @id @default(uuid())
-  type      String   // note | call | meeting | status_change etc.
+  type      String
   content   String?
   createdAt DateTime @default(now())
 
-  // Relations
   leadId String
   lead   Lead   @relation(fields: [leadId], references: [id])
 
   userId String
   user   User   @relation(fields: [userId], references: [id])
+}
+
+model LeadHistory {
+  id         String   @id @default(uuid())
+  leadId     String
+  changedBy  String
+  changeType String
+  changeData Json
+  createdAt  DateTime @default(now())
+
+  lead   Lead @relation(fields: [leadId], references: [id])
+  user   User @relation("UserLeadHistory", fields: [changedBy], references: [id])
 }

@@ -1,13 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const { createLead, listLeads, getLead, updateLead, deleteLead } = require('../controllers/leadController');
-const auth = require('../middlewares/authMiddleware');
-const role = require('../middlewares/roleMiddleware');
+const { authMiddleware, authorizeRoles } = require('../middlewares/auth'); // fixed import
 
-router.post('/', auth, role(['ADMIN','MANAGER','SALES_EXECUTIVE']), createLead);
-router.get('/', auth, listLeads);
-router.get('/:id', auth, getLead);
-router.patch('/:id', auth, updateLead);
-router.delete('/:id', auth, role(['ADMIN','MANAGER']), deleteLead);
+// Create lead: Admin, Manager, Sales can create
+router.post('/', authMiddleware, authorizeRoles(['ADMIN','MANAGER','SALES_EXECUTIVE']), createLead);
+
+// List leads: any logged-in user can list (role filtering happens in controller)
+router.get('/', authMiddleware, listLeads);
+
+// Get single lead: any logged-in user (controller handles role access)
+router.get('/:id', authMiddleware, getLead);
+
+// Update lead: Admin, Manager, Sales (controller checks ownership)
+router.patch('/:id', authMiddleware, updateLead);
+
+// Delete lead: only Admin and Manager can delete
+router.delete('/:id', authMiddleware, authorizeRoles(['ADMIN','MANAGER']), deleteLead);
 
 module.exports = router;

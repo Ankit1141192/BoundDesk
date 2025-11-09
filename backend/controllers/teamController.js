@@ -1,53 +1,72 @@
-const prisma = require('../config/db')
+const { prisma } = require('../config/db');
 
 const createTeam = async (req, res) => {
-  const { name, userIds = [] } = req.body;
-  const team = await prisma.team.create({
-    data: {
-      name,
-      users: { connect: userIds.map(id => ({ id })) }
-    },
-    include: { users: true }
-  });
-  res.status(201).json(team);
+  try {
+    const { name, userIds = [] } = req.body;
+    const team = await prisma.team.create({
+      data: {
+        name,
+        users: { connect: userIds.map(id => ({ id })) }
+      },
+      include: { users: true }
+    });
+    res.status(201).json(team);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to create team' });
+  }
 };
 
 const listTeams = async (req, res) => {
-  const teams = await prisma.team.findMany({ include: { users: true } });
-  res.json(teams);
+  try {
+    const teams = await prisma.team.findMany({ include: { users: true } });
+    res.json(teams);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to fetch teams' });
+  }
 };
 
 const getTeam = async (req, res) => {
-  const { id } = req.params;
-  const team = await prisma.team.findUnique({ where: { id }, include: { users: true, leads: true } });
-  if (!team) return res.status(404).json({ message: 'Not found' });
-  res.json(team);
+  try {
+    const { id } = req.params;
+    const team = await prisma.team.findUnique({ where: { id }, include: { users: true, leads: true } });
+    if (!team) return res.status(404).json({ message: 'Not found' });
+    res.json(team);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to fetch team' });
+  }
 };
 
 const updateTeam = async (req, res) => {
-  const { id } = req.params;
-  const { name, userIds } = req.body;
-  const data = { name };
-  const updated = await prisma.team.update({
-    where: { id },
-    data: {
-      name,
-      
-      ...(Array.isArray(userIds) ? {
-        users: {
-          set: userIds.map(uid => ({ id: uid }))
-        }
-      } : {})
-    },
-    include: { users: true }
-  });
-  res.json(updated);
+  try {
+    const { id } = req.params;
+    const { name, userIds } = req.body;
+    const updated = await prisma.team.update({
+      where: { id },
+      data: {
+        name,
+        ...(Array.isArray(userIds) ? { users: { set: userIds.map(uid => ({ id: uid })) } } : {})
+      },
+      include: { users: true }
+    });
+    res.json(updated);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to update team' });
+  }
 };
 
 const deleteTeam = async (req, res) => {
-  const { id } = req.params;
-  await prisma.team.delete({ where: { id } });
-  res.status(204).send();
+  try {
+    const { id } = req.params;
+    await prisma.team.delete({ where: { id } });
+    res.status(204).send();
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to delete team' });
+  }
 };
 
 module.exports = { createTeam, listTeams, getTeam, updateTeam, deleteTeam };

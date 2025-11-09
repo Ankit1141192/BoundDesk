@@ -1,9 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const { createActivity, listActivitiesForLead } = require('../controllers/activityController');
-const auth = require('../middlewares/authMiddleware');
+const { authMiddleware, authorizeRoles } = require('../middlewares/auth'); // fixed import
 
-router.post('/', auth, createActivity);
-router.get('/lead/:leadId', auth, listActivitiesForLead);
+// Create activity: any logged-in user (controller checks if user can access the lead)
+router.post('/', authMiddleware, createActivity);
+
+// List activities for a lead: any logged-in user (controller checks if user can access the lead)
+router.get('/lead/:leadId', authMiddleware, listActivitiesForLead);
 
 module.exports = router;
