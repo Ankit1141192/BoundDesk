@@ -4,9 +4,9 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
-  sslmode  = "require"
+  url      = env("DATABASE_URL") // sslmode is handled in the URL
 }
+
 enum Role {
   ADMIN
   MANAGER

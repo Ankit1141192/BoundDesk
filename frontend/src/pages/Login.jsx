@@ -5,7 +5,7 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/authSlice";
 import Loader from "../components/Loader";
-
+import {api} from "../utils/api"
 export default function Login() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [email, setEmail] = useState("");
@@ -54,11 +54,11 @@ export default function Login() {
     try {
       setLoading(true);
 
-      const res = await axios.post("http://localhost:5000/api/v1/auth/login", {
+      const res = await axios.post(`${api}/auth/login`, {
         email,
         password,
       });
-      
+
       localStorage.setItem("token", res.data.token);
       dispatch(loginSuccess(res.data.user));
 
