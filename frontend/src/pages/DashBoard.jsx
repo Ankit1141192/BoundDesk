@@ -9,18 +9,6 @@ import {
 } from "recharts";
 import { api } from "../utils/api";
 
-/**
- * Dashboard (Tailwind)
- * - Full-screen overlay loader / error
- * - Monthly sales bar chart (best month highlighted)
- * - Lead source pie chart
- * - Recent leads list with actions
- *
- * Notes:
- * - `api` can be either a base-url string or an axios instance.
- * - Ensure tailwind is configured and imported in your project.
- */
-
 export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [leads, setLeads] = useState([]);
@@ -338,21 +326,4 @@ export default function Dashboard() {
     </div>
   );
 }
-
-/* Optional demo seed:
-   If you don't have backend data yet and want to preview the charts,
-   uncomment the useEffect below. Remove before production.
-
-useEffect(() => {
-  if (leads.length === 0) {
-    const now = new Date();
-    const sample = [];
-    for (let i = 0; i < 8; i++) {
-      const d = new Date(now.getFullYear(), now.getMonth() - (7 - i), 1);
-      sample.push({ id: `demo-${i}`, name: `Demo ${i}`, value: (i + 1) * 15000, createdAt: d.toISOString() });
-    }
-    setLeads(sample);
-  }
-}, []);
-*/
 

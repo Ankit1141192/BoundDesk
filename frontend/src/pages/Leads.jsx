@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import axios from "axios";
 import Loader from "../components/Loader";
+import { api } from "../utils/api";
 
 const GlobalStyle = createGlobalStyle`
   body.modal-open {
@@ -172,9 +173,8 @@ export default function Leads() {
   try { user = JSON.parse(localStorage.getItem("user") || "null"); } catch (e) { user = null; }
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-  const API_BASE =  "http://localhost:5000/api/v1";
   const axiosInstance = axios.create({
-    baseURL: API_BASE,
+    baseURL: api,
     headers: { Authorization: token ? `Bearer ${token}` : "" },
   });
 

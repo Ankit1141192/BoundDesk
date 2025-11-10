@@ -1,53 +1,9 @@
+// src/pages/Profile.jsx
 import { useState, useEffect, useRef } from "react";
-import { Container, Card } from "../components/styles";
+import { Container, Card, Input, Button, ProfileIcon } from "../components/styles";
 import axios from "axios";
 import Loader from "../components/Loader";
-import styled from "styled-components";
 import { api } from "../utils/api";
-
-// Neumorphic input
-const Input = styled.input`
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border-radius: 1rem;
-  margin-bottom: 0.5rem;
-  border: none;
-  background: #e0e5ec;
-  box-shadow: inset 6px 6px 12px #bec3cf, inset -6px -6px 12px #ffffff;
-  outline: none;
-`;
-
-// Neumorphic button
-const Button = styled.button`
-  padding: 0.75rem 1rem;
-  border-radius: 1rem;
-  border: none;
-  background: #e0e5ec;
-  box-shadow: 6px 6px 12px #bec3cf, -6px -6px 12px #ffffff;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.2s;
-  &:hover {
-    box-shadow: inset 6px 6px 12px #bec3cf, inset -6px -6px 12px #ffffff;
-  }
-`;
-
-const ProfileIcon = styled.div`
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: #e0e5ec;
-  box-shadow: 8px 8px 20px #bec3cf, -8px -8px 20px #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto;
-  svg {
-    width: 40px;
-    height: 40px;
-    color: #6c7293;
-  }
-`;
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -63,6 +19,7 @@ export default function Profile() {
 
   useEffect(() => {
     fetchProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchProfile = async () => {
@@ -97,7 +54,19 @@ export default function Profile() {
     }
   };
 
-  if (loading || !user) return <Loader />;
+  // Center loader in UI instead of a raw return
+  if (loading || !user) {
+    return (
+      <Container>
+        <div style={{ maxWidth: "500px", width: "100%" }}>
+
+
+          <Loader />
+
+        </div>
+      </Container>
+    );
+  }
 
   return (
     <Container>
@@ -105,8 +74,8 @@ export default function Profile() {
         <Card style={{ padding: "2rem" }}>
           <ProfileIcon>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
             </svg>
           </ProfileIcon>
 
