@@ -89,7 +89,7 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-           <Route
+          <Route
             path="/notifications"
             element={
               <ProtectedRoute>
@@ -101,7 +101,7 @@ const App = () => {
             path="/activities"
             element={
               <ProtectedRoute>
-               <Activities/>
+                <Activities />
               </ProtectedRoute>
             }
           />

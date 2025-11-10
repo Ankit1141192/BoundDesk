@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+// src/pages/Activities.jsx
+import { useState, useEffect, useRef } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import axios from "axios";
 import Loader from "../components/Loader";
-import { api } from "../utils/api";
 
 const GlobalStyle = createGlobalStyle`
   body.modal-open {
@@ -127,23 +127,27 @@ export default function Activities({ leadId }) {
   const [newActivity, setNewActivity] = useState({ type: "Call", content: "", scheduledAt: "" });
   const [showModal, setShowModal] = useState(false);
 
-  const user = JSON.parse(localStorage.getItem("user"));
-  const token = localStorage.getItem("token");
+  const messageRef = useRef(null);
+  const user = (() => { try { return JSON.parse(localStorage.getItem("user") || "null"); } catch { return null; } })();
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const API_BASE =  "http://localhost:5000/api/v1";
 
   const axiosInstance = axios.create({
-    baseURL: `${api}`,
-    headers: { Authorization: `Bearer ${token}` },
+    baseURL: API_BASE,
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
 
   useEffect(() => {
+    if (!leadId) return;
     fetchActivities();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [leadId]);
 
   const fetchActivities = async () => {
     setLoading(true);
     try {
-      const res = await axiosInstance.get(`/activities/${leadId}`);
-      setActivities(res.data);
+      const res = await axiosInstance.get(`/activities/lead/${leadId}`);
+      setActivities(res.data || []);
     } catch (err) {
       console.error(err);
       alert("Failed to fetch activities");
@@ -154,12 +158,14 @@ export default function Activities({ leadId }) {
 
   const handleCreateActivity = async () => {
     if (!newActivity.content) return alert("Content required");
+    if (!token) return alert("Login required to create activity");
     try {
       const payload = { ...newActivity, leadId };
       const res = await axiosInstance.post("/activities", payload);
-      setActivities((prev) => [res.data, ...prev]);
+      setActivities((prev) => [...prev, res.data]); // returned activity appended in chronological order
       setNewActivity({ type: "Call", content: "", scheduledAt: "" });
       setShowModal(false);
+      document.body.classList.remove("modal-open");
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.message || "Failed to create activity");
@@ -173,11 +179,12 @@ export default function Activities({ leadId }) {
         <ContentWrapper>
           <PageTitle>Activities</PageTitle>
           <HeaderRow>
-            <Button onClick={() => setShowModal(true)}>Add Activity</Button>
+            <Button onClick={() => { setShowModal(true); document.body.classList.add('modal-open'); }}>Add Activity</Button>
           </HeaderRow>
 
           {loading ? <Loader /> : (
             <>
+              {activities.length === 0 && <div style={{ textAlign: "center", color: "#6c7293", padding: "2rem" }}>No activities yet</div>}
               {activities.map(act => (
                 <ActivityItem key={act.id}>
                   <div>
@@ -197,13 +204,15 @@ export default function Activities({ leadId }) {
       </PageWrapper>
 
       {showModal && (
-        <ModalOverlay onClick={() => setShowModal(false)}>
+        <ModalOverlay onClick={() => { setShowModal(false); document.body.classList.remove('modal-open'); }}>
           <Modal onClick={e => e.stopPropagation()}>
             <ModalHeader>Add Activity</ModalHeader>
             <Select value={newActivity.type} onChange={e => setNewActivity({ ...newActivity, type: e.target.value })}>
               <option value="Call">Call</option>
               <option value="Email">Email</option>
               <option value="Meeting">Meeting</option>
+              <option value="message">Message</option>
+              <option value="enquiry">Enquiry</option>
             </Select>
             <Input
               placeholder="Content"
@@ -215,7 +224,10 @@ export default function Activities({ leadId }) {
               value={newActivity.scheduledAt}
               onChange={e => setNewActivity({ ...newActivity, scheduledAt: e.target.value })}
             />
-            <Button onClick={handleCreateActivity}>Add Activity</Button>
+            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+              <Button onClick={() => { setShowModal(false); document.body.classList.remove('modal-open'); }}>Cancel</Button>
+              <Button onClick={handleCreateActivity}>Add Activity</Button>
+            </div>
           </Modal>
         </ModalOverlay>
       )}

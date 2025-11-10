@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL") // sslmode is handled in the URL
+  url      = env("DATABASE_URL")
 }
 
 enum Role {
@@ -12,6 +12,20 @@ enum Role {
   MANAGER
   SALES_EXECUTIVE
   USER
+}
+
+enum LeadStatus {
+  NEW
+  OPEN
+  WON
+  LOST
+  ARCHIVED
+}
+
+enum LeadPriority {
+  Hot
+  Warm
+  Cold
 }
 
 model User {
@@ -23,9 +37,10 @@ model User {
   role         Role      @default(USER)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
-  resetToken   String? 
+  resetToken   String?
   resetExpires DateTime?
 
+  // relations
   teams        Team[]    @relation("TeamUsers")
   leads        Lead[]    @relation("LeadOwner")
   activities   Activity[]
@@ -35,6 +50,7 @@ model User {
 model Team {
   id        String   @id @default(uuid())
   name      String
+  managerId String?      // user id of manager (optional)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -43,14 +59,17 @@ model Team {
 }
 
 model Lead {
-  id          String     @id @default(uuid())
+  id          String       @id @default(uuid())
   name        String
   email       String?
   phone       String?
   company     String?
-  status      String     @default("NEW")
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  status      LeadStatus   @default(NEW)
+  priority    LeadPriority?
+  source      String?
+  value       Float?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
   ownerId String
   owner   User       @relation("LeadOwner", fields: [ownerId], references: [id])
