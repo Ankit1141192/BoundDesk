@@ -44,5 +44,14 @@ Built using **React**, **Node.js**, and **PostgreSQL**, it combines performance,
 | **Auth** | JWT-based login/signup for secure sessions |
 
 ---
-
+**Login Page** 
+<img width="1920" height="1080" alt="Screenshot (2404)" src="https://github.com/user-attachments/assets/d555c811-36cf-465e-b7fa-c8d594ef9b3f" />
+**Sinup Page** 
+<img width="1920" height="1080" alt="Screenshot (2405)" src="https://github.com/user-attachments/assets/3627f8f5-906f-4699-b970-122010fef404" />
+**Dashboard**
+<img width="1920" height="1080" alt="Screenshot (2406)" src="https://github.com/user-attachments/assets/188ccdf4-15c7-42ac-9abd-ea301cf77008" />
+**Leads**
+<img width="1920" height="1080" alt="Screenshot (2407)" src="https://github.com/user-attachments/assets/dfe87ec9-faa4-4b5d-8ce8-5c68b054f789" />
+**Profile**
+<img width="1920" height="1080" alt="Screenshot (2408)" src="https://github.com/user-attachments/assets/9af02c4a-6ec1-4a9a-a243-4c933b63489b" />
 
