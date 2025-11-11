@@ -1,4 +1,3 @@
-// src/components/Notifications.jsx
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Bell, Trash2, Check, Settings } from "lucide-react";

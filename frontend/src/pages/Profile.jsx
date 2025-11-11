@@ -1,4 +1,3 @@
-// src/pages/Profile.jsx
 import { useState, useEffect, useRef } from "react";
 import { Container, Card, Input, Button, ProfileIcon } from "../components/styles";
 import axios from "axios";

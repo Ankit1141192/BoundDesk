@@ -1,4 +1,3 @@
-// src/pages/Leads.jsx
 import React, { useState, useEffect, useRef } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import axios from "axios";
